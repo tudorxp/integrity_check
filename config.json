@@ -1,0 +1,9 @@
+{
+	"new_path": "/Users/tudorxp/Downloads",
+	"old_path": "/Users/tudorxp/D2",
+	"db_connstr": "postgresql://icheck:yes@localhost:5432/icheck?sslmode=disable",
+	"table_name": "icheck",
+	"where_clause": " changed <= '2019-03-23 14:00:00'::timestamp ",
+	"db_maxconnections": 16,
+	"db_idleconnections": 2
+}
