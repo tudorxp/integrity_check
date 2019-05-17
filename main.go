@@ -122,7 +122,7 @@ func main() {
 
   l.Print("building hashes in path_new")
 
-  query := fmt.Sprintf("select filename from %s where hash_new is null",conf.Table_name)
+  query := fmt.Sprintf("select filename from %s where hash_new is null",pq.QuoteIdentifier(conf.Table_name))
   if conf.Where_clause != "" {
     query += " and " + conf.Where_clause
   }
@@ -157,7 +157,7 @@ func main() {
 
   l.Print("building hashes in path_old")
 
-  query = fmt.Sprintf("select filename from %s where hash_old is null",conf.Table_name)
+  query = fmt.Sprintf("select filename from %s where hash_old is null",pq.QuoteIdentifier(conf.Table_name))
   if conf.Where_clause != "" {
     query += " and " + conf.Where_clause
   }
