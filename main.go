@@ -283,7 +283,7 @@ func hash_new_file (to_hash chan string) {
     // l.Printf("hash for %s: %x",file,hash)
 
     // add to DB
-    _, err = db.Exec( fmt.Sprintf("update %s set hash_new = $2 where filename = $1",conf.Table_name), file, fmt.Sprintf("%x",hash) )
+    _, err = db.Exec( fmt.Sprintf("update %s set hash_new = $2 where filename = $1",pq.QuoteIdentifier(conf.Table_name)), file, fmt.Sprintf("%x",hash) )
     if err != nil {
       l.Print("error adding hash to DB: ", err)
       continue
@@ -320,7 +320,7 @@ func hash_old_file (to_hash chan string) {
     // l.Printf("hash for %s: %x",file,hash)
 
     // add to DB
-    _, err = db.Exec( fmt.Sprintf("update %s set hash_old = $2 where filename = $1",conf.Table_name), file, fmt.Sprintf("%x",hash) )
+    _, err = db.Exec( fmt.Sprintf("update %s set hash_old = $2 where filename = $1",pq.QuoteIdentifier(conf.Table_name)), file, fmt.Sprintf("%x",hash) )
     if err != nil {
       l.Print("error adding hash to DB: ", err)
       continue
