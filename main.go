@@ -81,6 +81,7 @@ func main() {
     `,pq.QuoteIdentifier(conf.Table_name)))
   die_if(err)
 
+  // TODO: index table
 
   // Check the number of rows in stable
 
@@ -187,6 +188,12 @@ func main() {
   close(to_hash)
   wg.Wait()
 
+  // TODO: implement check logic against DB
+  // something like:
+  // select filename from icheck where hash_new is not null and hash_old is not null and hash_new <> hash_old ?
+
+  l.Print("hashing complete. Run comparison queries on database please")
+
 }
 
 func load_config(config_filename *string) error {
@@ -283,7 +290,20 @@ func hash_new_file (to_hash chan string) {
     // l.Printf("hash for %s: %x",file,hash)
 
     // add to DB
-    _, err = db.Exec( fmt.Sprintf("update %s set hash_new = $2 where filename = $1",pq.QuoteIdentifier(conf.Table_name)), file, fmt.Sprintf("%x",hash) )
+
+    tx, err := db.Begin()
+    if err != nil {
+      l.Print("error adding hash to DB: ", err)
+      continue
+    }
+
+    _, err = tx.Exec( fmt.Sprintf("update %s set hash_new = $2 where filename = $1",pq.QuoteIdentifier(conf.Table_name)), file, fmt.Sprintf("%x",hash) )
+    if err != nil {
+      l.Print("error adding hash to DB: ", err)
+      continue
+    }
+
+    err = tx.Commit()
     if err != nil {
       l.Print("error adding hash to DB: ", err)
       continue
@@ -320,7 +340,19 @@ func hash_old_file (to_hash chan string) {
     // l.Printf("hash for %s: %x",file,hash)
 
     // add to DB
-    _, err = db.Exec( fmt.Sprintf("update %s set hash_old = $2 where filename = $1",pq.QuoteIdentifier(conf.Table_name)), file, fmt.Sprintf("%x",hash) )
+    tx, err := db.Begin()
+    if err != nil {
+      l.Print("error adding hash to DB: ", err)
+      continue
+    }
+
+    _, err = tx.Exec( fmt.Sprintf("update %s set hash_old = $2 where filename = $1",pq.QuoteIdentifier(conf.Table_name)), file, fmt.Sprintf("%x",hash) )
+    if err != nil {
+      l.Print("error adding hash to DB: ", err)
+      continue
+    }
+
+    err = tx.Commit()
     if err != nil {
       l.Print("error adding hash to DB: ", err)
       continue
